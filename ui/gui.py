@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'ui/gui.ui'
+#
+# Created by: PyQt5 UI code generator 5.14.2
+#
+# WARNING! All changes made in this file will be lost!
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(602, 536)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.file_list = QtWidgets.QListWidget(self.centralwidget)
+        self.file_list.setGeometry(QtCore.QRect(75, 70, 451, 192))
+        self.file_list.setObjectName("file_list")
+        self.img_quality_slider = QtWidgets.QSlider(self.centralwidget)
+        self.img_quality_slider.setGeometry(QtCore.QRect(80, 300, 181, 22))
+        self.img_quality_slider.setOrientation(QtCore.Qt.Horizontal)
+        self.img_quality_slider.setObjectName("img_quality_slider")
+        self.source_button = QtWidgets.QPushButton(self.centralwidget)
+        self.source_button.setGeometry(QtCore.QRect(80, 350, 113, 32))
+        self.source_button.setObjectName("source_button")
+        self.destination_button = QtWidgets.QPushButton(self.centralwidget)
+        self.destination_button.setGeometry(QtCore.QRect(80, 400, 113, 32))
+        self.destination_button.setObjectName("destination_button")
+        self.download_button = QtWidgets.QPushButton(self.centralwidget)
+        self.download_button.setGeometry(QtCore.QRect(80, 460, 113, 32))
+        self.download_button.setObjectName("download_button")
+        self.source_path = QtWidgets.QLabel(self.centralwidget)
+        self.source_path.setGeometry(QtCore.QRect(220, 360, 301, 21))
+        self.source_path.setObjectName("source_path")
+        self.destination_path = QtWidgets.QLabel(self.centralwidget)
+        self.destination_path.setGeometry(QtCore.QRect(220, 410, 301, 20))
+        self.destination_path.setObjectName("destination_path")
+        self.img_quality_box = QtWidgets.QLineEdit(self.centralwidget)
+        self.img_quality_box.setGeometry(QtCore.QRect(280, 300, 61, 21))
+        self.img_quality_box.setObjectName("img_quality_box")
+        self.cancel_button = QtWidgets.QPushButton(self.centralwidget)
+        self.cancel_button.setGeometry(QtCore.QRect(210, 460, 113, 32))
+        self.cancel_button.setObjectName("cancel_button")
+        self.remove_button = QtWidgets.QPushButton(self.centralwidget)
+        self.remove_button.setGeometry(QtCore.QRect(410, 290, 113, 32))
+        self.remove_button.setObjectName("remove_button")
+        self.img_quality_label = QtWidgets.QLabel(self.centralwidget)
+        self.img_quality_label.setGeometry(QtCore.QRect(80, 280, 171, 21))
+        self.img_quality_label.setObjectName("img_quality_label")
+        self.title = QtWidgets.QLabel(self.centralwidget)
+        self.title.setGeometry(QtCore.QRect(230, 10, 151, 31))
+        font = QtGui.QFont()
+        font.setFamily(".AppleSystemUIFont")
+        font.setPointSize(18)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.title.setFont(font)
+        self.title.setStyleSheet("font: 18pt \".AppleSystemUIFont\";")
+        self.title.setObjectName("title")
+        self.percent_label = QtWidgets.QLabel(self.centralwidget)
+        self.percent_label.setGeometry(QtCore.QRect(342, 300, 21, 16))
+        self.percent_label.setObjectName("percent_label")
+        self.disclaimer_label = QtWidgets.QLabel(self.centralwidget)
+        self.disclaimer_label.setGeometry(QtCore.QRect(200, 40, 211, 21))
+        self.disclaimer_label.setObjectName("disclaimer_label")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 602, 22))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Image Optimizer"))
+        self.source_button.setText(_translate("MainWindow", "Source"))
+        self.destination_button.setText(_translate("MainWindow", "Destination"))
+        self.download_button.setText(_translate("MainWindow", "Download"))
+        self.source_path.setText(_translate("MainWindow", "source"))
+        self.destination_path.setText(_translate("MainWindow", "destination"))
+        self.cancel_button.setText(_translate("MainWindow", "Cancel"))
+        self.remove_button.setText(_translate("MainWindow", "Remove"))
+        self.img_quality_label.setText(_translate("MainWindow", "Image quality:"))
+        self.title.setText(_translate("MainWindow", "Image Optimizer"))
+        self.percent_label.setText(_translate("MainWindow", "%"))
+        self.disclaimer_label.setText(_translate("MainWindow", "Currently supports JPEG & PNG"))
