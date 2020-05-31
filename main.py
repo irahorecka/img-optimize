@@ -4,10 +4,10 @@ import qdarkstyle
 from PyQt5.QtCore import QThread, QPersistentModelIndex, pyqtSignal
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QFileDialog,
     QMainWindow,
-    QTableWidgetItem,
     QSlider,
     QMessageBox,
     QPushButton,
@@ -42,18 +42,21 @@ class MainPage(QMainWindow, UiMainWindow):
         self.destination_img_path = BASE_PATH
         self.destination_button.clicked.connect(self.set_destination_path)
         self.destination_path.setText(self.get_parent_current_dir(BASE_PATH))
+        # remove button
+        self.file_list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.remove_button.clicked.connect(self.remove_selected_img)
         # download button
         self.download_button.clicked.connect(self.download)
         # cancel button
         self.cancel_button.clicked.connect(self.close)
         # download imgs filepaths
-        self.total_imgs = []
+        self.total_imgs = {}
 
     def display_img_quality_box(self):
         self.img_quality_box.setText(str(self.img_quality_slider.value()))
 
     def adj_img_quality_slider(self):
-        self.img_quality_slider.setValue(int(self.get_cell_text(self.img_quality_box)))
+        self.img_quality_slider.setValue(int(self.get_text(self.img_quality_box)))
 
     def set_source_path(self):
         upload_type = self.source_type_popup()
@@ -62,7 +65,7 @@ class MainPage(QMainWindow, UiMainWindow):
                 self,
                 "Open file",
                 BASE_PATH,
-                "JPEG (*.jpg;*.jpeg;*.jpeg2000;*.JPG;*.JPEG);;GIF (*.gif;*.GIF);;PNG (*.png;*.PNG);;TIF (*.tif;*.tiff);;BMP (*.bmp)",
+                ("JPEG (*.jpg;*.jpeg;*.jpeg2000;*.JPG;*.JPEG);;GIF (*.gif;*.GIF);;PNG (*.png;*.PNG);;TIF (*.tif;*.tiff);;BMP (*.bmp)"),
             )
             file_path = self.get_img_from_file(source_file_path)
         else:
@@ -70,9 +73,11 @@ class MainPage(QMainWindow, UiMainWindow):
                 self, "Open folder", BASE_PATH
             )
             file_path = self.get_img_from_folder(source_folder_path)
-        self.total_imgs.extend(file_path)
-        # self.total_unique_imgs is the dtype to download images from...
-        self.total_unique_imgs = set(self.total_imgs)
+
+        for img in file_path:
+            # NOTE: using truncated img path as key can affect scalability in future
+            # self.total_imgs is the download dtype ref
+            self.total_imgs[self.get_parent_current_dir(img)] = img
         self.set_img_list_widget()
 
     def source_type_popup(self):
@@ -126,7 +131,7 @@ class MainPage(QMainWindow, UiMainWindow):
 
     def set_img_list_widget(self):
         file_path_dirs = [
-            self.get_parent_current_dir(file) for file in list(self.total_unique_imgs)
+            key for key, value in self.total_imgs.items()
         ]
         self.file_list.clear()
         self.file_list.addItems(file_path_dirs)
@@ -143,7 +148,7 @@ class MainPage(QMainWindow, UiMainWindow):
         )
 
     def download(self):
-        self.parallel_compress(tuple(self.total_unique_imgs))
+        self.parallel_compress(tuple(value for key, value in self.total_imgs.items()))
 
     def parallel_compress(self, img_path_iter):
         destination_path_iter = [self.destination_img_path for i in img_path_iter]
@@ -151,15 +156,23 @@ class MainPage(QMainWindow, UiMainWindow):
         args = zip(img_path_iter, destination_path_iter, img_quality_vals)
         compressed_img = map_processes(compress_img, args)
 
+    def remove_selected_img(self):
+        selected_img = self.file_list.selectedItems()
+        if not selected_img:
+            return
+        for img in selected_img:
+            self.file_list.takeItem(self.file_list.row(img))
+            self.total_imgs.pop(self.get_text(img), None)
+
     @staticmethod
-    def get_cell_text(cell_item):
+    def get_text(item):
         """Get text of cell value, if empty return empty str."""
         try:
-            cell_item = cell_item.text()
-            return cell_item
+            item = item.text()
+            return item
         except AttributeError:
-            cell_item = ""
-            return cell_item
+            item = ""
+            return item
 
     @staticmethod
     def get_parent_current_dir(current_path):
