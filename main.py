@@ -10,10 +10,11 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QSlider,
     QMessageBox,
-    QPushButton
+    QPushButton,
 )
 from ui import UiMainWindow
 from compress import open_image, save_image
+from utils import map_processes
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,6 +39,7 @@ class MainPage(QMainWindow, UiMainWindow):
         self.source_button.clicked.connect(self.set_source_path)
         self.source_path.setText(self.get_parent_current_dir(BASE_PATH))
         # destination path
+        self.destination_img_path = BASE_PATH
         self.destination_button.clicked.connect(self.set_destination_path)
         self.destination_path.setText(self.get_parent_current_dir(BASE_PATH))
         # download button
@@ -55,9 +57,12 @@ class MainPage(QMainWindow, UiMainWindow):
 
     def set_source_path(self):
         upload_type = self.source_type_popup()
-        if upload_type == 'file':
+        if upload_type == "file":
             source_file_path = QFileDialog.getOpenFileNames(
-                self, "Open file", BASE_PATH, "JPEG (*.jpg;*.jpeg;*.jpeg2000;*.JPG;*.JPEG);;GIF (*.gif;*.GIF);;PNG (*.png;*.PNG);;TIF (*.tif;*.tiff);;BMP (*.bmp)"
+                self,
+                "Open file",
+                BASE_PATH,
+                "JPEG (*.jpg;*.jpeg;*.jpeg2000;*.JPG;*.JPEG);;GIF (*.gif;*.GIF);;PNG (*.png;*.PNG);;TIF (*.tif;*.tiff);;BMP (*.bmp)",
             )
             file_path = self.get_img_from_file(source_file_path)
         else:
@@ -69,41 +74,60 @@ class MainPage(QMainWindow, UiMainWindow):
         # self.total_unique_imgs is the dtype to download images from...
         self.total_unique_imgs = set(self.total_imgs)
         self.set_img_list_widget()
-        
 
     def source_type_popup(self):
         msg = QMessageBox()
-        msg.setWindowTitle('Upload Type')
-        msg.setText('Are you uploading a file or folder?')
-        msg.addButton(QPushButton('File'), QMessageBox.YesRole)
-        msg.addButton(QPushButton('Folder'), QMessageBox.YesRole)
+        msg.setWindowTitle("Upload Type")
+        msg.setText("Are you uploading a file or folder?")
+        msg.addButton(QPushButton("File"), QMessageBox.YesRole)
+        msg.addButton(QPushButton("Folder"), QMessageBox.YesRole)
         # TODO: enable closing feature on window close button
         upload_type_bool = msg.exec_()
         if not upload_type_bool:
-            return 'file'
-        return 'folder'
+            return "file"
+        return "folder"
 
     def get_img_from_file(self, file_path):
         file_path, _ = file_path
         if not file_path:
             return []
-        
+
         parent_folder_first_file = os.path.split(file_path[0])[0]
         self.source_path.setText(self.get_parent_current_dir(parent_folder_first_file))
 
         return file_path
 
     def get_img_from_folder(self, folder_path):
-        acceptable_img_ext = ('.jpg', '.jpeg', '.jpeg2000', '.gif', '.png', '.PNG', '.tif', '.tiff', '.bmp')
+        acceptable_img_ext = (
+            ".jpg",
+            ".jpeg",
+            ".jpeg2000",
+            ".gif",
+            ".png",
+            ".PNG",
+            ".tif",
+            ".tiff",
+            ".bmp",
+        )
         if not folder_path:
             return []
-        file_path = [os.path.abspath(item) for item in os.listdir(folder_path) if not item.startswith('.')]
-        file_path = [os.path.abspath(item) for item in file_path if os.path.splitext(item)[1].lower() in acceptable_img_ext]
+        file_path = [
+            os.path.join(folder_path, item)
+            for item in os.listdir(folder_path)
+            if not item.startswith(".")
+        ]
+        file_path = [
+            os.path.join(folder_path, item)
+            for item in file_path
+            if os.path.splitext(item)[1].lower() in acceptable_img_ext
+        ]
 
         return file_path
 
     def set_img_list_widget(self):
-        file_path_dirs = [self.get_parent_current_dir(file) for file in list(self.total_unique_imgs)]
+        file_path_dirs = [
+            self.get_parent_current_dir(file) for file in list(self.total_unique_imgs)
+        ]
         self.file_list.clear()
         self.file_list.addItems(file_path_dirs)
 
@@ -114,21 +138,18 @@ class MainPage(QMainWindow, UiMainWindow):
         if not self.destination_img_path:
             self.destination_img_path = BASE_PATH
 
-        _, img_filename = os.path.split(self.source_img_path)
-        self.destination_img_path = os.path.join(
-            self.destination_img_path, img_filename
-        )
-
         self.destination_path.setText(
             self.get_parent_current_dir(self.destination_img_path)
         )
 
     def download(self):
-        img = open_image(self.source_img_path)
-        if not img:
-            print("whoops, bad image.")
-        else:
-            save_image(img, self.destination_img_path, self.img_quality_slider.value())
+        self.parallel_compress(tuple(self.total_unique_imgs))
+
+    def parallel_compress(self, img_path_iter):
+        destination_path_iter = [self.destination_img_path for i in img_path_iter]
+        img_quality_vals = [self.img_quality_slider.value() for i in img_path_iter]
+        args = zip(img_path_iter, destination_path_iter, img_quality_vals)
+        compressed_img = map_processes(compress_img, args)
 
     @staticmethod
     def get_cell_text(cell_item):
@@ -148,6 +169,19 @@ class MainPage(QMainWindow, UiMainWindow):
         parent_current_dir = f"../{parent_dir}/{current_dir}"
 
         return parent_current_dir
+
+
+def compress_img(args):
+    source_img_path, destination_image_path, img_quality_val = args
+    source_img_name = os.path.split(source_img_path)[1]
+    img = open_image(source_img_path)
+    if not img:
+        print("whoops, bad image.")
+    else:
+        full_destination_image_path = os.path.join(
+            destination_image_path, source_img_name
+        )
+        save_image(img, full_destination_image_path, img_quality_val)
 
 
 if __name__ == "__main__":
