@@ -55,7 +55,12 @@ class MainPage(QMainWindow, UiMainWindow):
 
     def adj_img_quality_slider(self):
         """Set slider value to image quality box value."""
-        self.img_quality_slider.setValue(int(self.get_text(self.img_quality_box)))
+        try:
+            img_quality_val = int(self.get_text(self.img_quality_box))
+        except ValueError:  # i.e. non-numerics passed
+            img_quality_val = 80
+            self.img_quality_box.setText(str(img_quality_val))
+        self.img_quality_slider.setValue(img_quality_val)
 
     def set_source_path(self):
         """Method to set source files, either imgs in a folder
@@ -129,7 +134,12 @@ class MainPage(QMainWindow, UiMainWindow):
         destination_path_iter = [self.destination_img_path for i in img_path_iter]
         img_quality_vals = [self.img_quality_slider.value() for i in img_path_iter]
         args = zip(img_path_iter, destination_path_iter, img_quality_vals)
+
+        self.download_button.setEnabled(
+            False
+        )  # disable download button until download finished
         compressed_img = map_processes(compress_img, args)
+        self.download_button.setEnabled(True)
 
     @staticmethod
     def get_img_from_file(file_path):
