@@ -50,6 +50,8 @@ There are several notable features - view figure below for visual aid:
 6) Exiting the application.
     - Simply click "Cancel" to exit the application.
 
+View video demo `here <https://i.imgur.com/y2zJ4Bc.mp4>`__.
+
 |
 
 .. image:: https://i.imgur.com/MVDkxXF.png
