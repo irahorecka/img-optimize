@@ -10,10 +10,11 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QPushButton,
 )
-from ui import UiMainWindow
-from utils import map_processes, open_image, save_image
+from .gui import Ui_MainWindow as UiMainWindow
+from ._threading import map_processes
+from .optimize import open_image, save_image
 
-BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+BASE_PATH = os.path.abspath(os.getcwd())
 
 
 class MainPage(QMainWindow, UiMainWindow):
@@ -222,7 +223,7 @@ def compress_img(args):
         save_image(img, full_destination_image_path, img_quality_val)
 
 
-if __name__ == "__main__":
+def run():
     APP = QApplication(sys.argv)
     WIDGET = MainPage()
     APP.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())

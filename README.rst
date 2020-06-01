@@ -18,6 +18,7 @@ Running the program
 ::
 
     import imgoptimize
+    imgoptimize.run()
 
 |
 
