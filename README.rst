@@ -29,17 +29,17 @@ The application below will appear.
 
 Operating the application
 -------------------------
-There are several notable features - view figure below for visual aid:
+There are several features - view figure below for visual aid:
 
 1) Sourcing your images.
-    - If you click "Source", you are given the option to either upload one or more image files (JPEG or PNG) or selecting a folder containing your images.
-        - If you select an image folder, only JPEG and PNG images will be uploaded.
+    - If you click "Source", you're given the option to either upload one or more image files (JPEG or PNG) or select a folder with your images.
+        - If you select a folder, only JPEG and PNG images will be uploaded.
 
 2) Working with images.
-    - Valid images will populate the viewport. You are able to remove images from this viewport by selecting an image (or more) and clicking "Remove"
+    - Valid images will populate the viewport. You can remove images from this viewport by selecting one or more items and selecting "Remove".
 
 3) Setting image quality percentage.
-    - You can set the image quality percentage by either moving the slider under the "Image quality:" label, or manually entering the image quality value between 1 and 100.
+    - You can set the image quality percentage by either moving the slider under the "Image quality:" label, or manually entering an image quality percentage value between 1 and 100.
 
 4) Setting destination path.
     - Click "Destination" and select a folder to store your images.
